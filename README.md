@@ -2,10 +2,7 @@
 
 A Claude Code plugin that shows what's in your context window and which tokens are going to waste.
 
-<p>
-  <img src="docs/overview.png" alt="Overview tab" width="49%">
-  <img src="docs/blocks.png" alt="Blocks tab" width="49%">
-</p>
+<img src="docs/blocks.png" alt="Blocks tab: likely waste with Drop buttons" width="520">
 
 ## Install
 
