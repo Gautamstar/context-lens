@@ -30,6 +30,10 @@ const DROP_WINDOW_MS = 120_000
 // Read by the session.compact hook's .catch, which cannot reach $.state.
 let isDropPending = false
 
+// Where a command typed by the person comes from: the prompt, a phone or web
+// client, or the desktop app and other SDK hosts.
+const PERSON_ORIGINS = new Set(['composer', 'bridge', 'sdk'])
+
 const DROP_STUB =
   '[Context Lens removed this tool result to save context. Run the tool again if you need what it said.]'
 
@@ -349,7 +353,13 @@ export const register: Register = (on, options) => {
     await openPane($)
     const [verb, amount] = e.args.trim().split(/\s+/)
     if (verb === 'ablate') {
-      if (amount === 'run') return { text: await startAblation($) }
+      if (amount === 'run') {
+        // A run spends model tokens, so only the person may start it.
+        if (!PERSON_ORIGINS.has(e.origin.kind)) {
+          return { text: `Context Lens runs an ablation only when you start it (this came from ${e.origin.kind}).` }
+        }
+        return { text: await startAblation($) }
+      }
       if (amount === 'cancel') return { text: await cancelAblation($) }
       const count = Math.min(MAX_CANDIDATES, Math.max(1, Number(amount) || DEFAULT_CANDIDATES))
       await update($, paneTab, () => 'ablation' as const)
@@ -378,7 +388,16 @@ export const register: Register = (on, options) => {
     const pending = e.agentId === undefined && (e.trigger === 'manual' || e.trigger === 'plugin')
       ? await read($, dropRequest)
       : null
-    const request = pending && !pending.isApplied && (await $.clock.now()) - pending.at < DROP_WINDOW_MS ? pending : null
+    const isFresh = pending !== null && (await $.clock.now()) - pending.at < DROP_WINDOW_MS
+    // While this module waits on the /compact it queued, the compaction is the
+    // Drop's however late it runs; one that came from anywhere else is used
+    // only within the window.
+    const request = pending && !pending.isApplied && (isDropPending || isFresh) ? pending : null
+    if (!request && isDropPending && e.agentId === undefined && e.trigger !== 'precompute') {
+      // Never let a Drop turn into a summarizing compaction: that costs tokens
+      // and rewrites far more than the person asked to remove.
+      return { skip: 'Context Lens could not apply the drop, so nothing was compacted.' }
+    }
     if (!request) {
       const hints = settings.compactionHints && e.agentId === undefined ? await hintsFor($, e.messages) : undefined
       const result = await next(hints === undefined ? e : { ...e, instructions: withHints(e.instructions, hints) })

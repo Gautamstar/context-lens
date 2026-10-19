@@ -173,6 +173,9 @@ export const PRICES: Record<string, { input: number; output: number }> = {
 
 // A replay's answer is capped at 150 words; this is a little over that.
 const ANSWER_TOKENS = 300
+// Each judge call reads the question and two answers and names one label.
+const JUDGE_INPUT_TOKENS = 1000
+const JUDGE_OUTPUT_TOKENS = 10
 
 export type AblationEstimate = { replays: number; promptTokens: number; totalTokens: number; usd?: number }
 
@@ -189,6 +192,11 @@ export const estimateAblation = (
   const promptSize = promptTokens(replayPrompt(replay, marks))
   const replays = candidates.length + 2
   const price = PRICES[model]
-  const usd = price && (replays * (promptSize * price.input + ANSWER_TOKENS * price.output)) / 1_000_000
+  // One judge call per replay but the first baseline, priced at the replay model's rate.
+  const judges = replays - 1
+  const usd = price && (
+    replays * (promptSize * price.input + ANSWER_TOKENS * price.output) +
+    judges * (JUDGE_INPUT_TOKENS * price.input + JUDGE_OUTPUT_TOKENS * price.output)
+  ) / 1_000_000
   return { replays, promptTokens: promptSize, totalTokens: replays * promptSize, usd }
 }
