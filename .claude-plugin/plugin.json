@@ -1,12 +1,12 @@
 {
   "name": "context-lens",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": { "name": "Gautam Singh", "url": "https://github.com/Gautamstar" },
   "homepage": "https://github.com/Gautamstar/context-lens",
   "repository": "https://github.com/Gautamstar/context-lens",
   "license": "MIT",
   "keywords": ["context", "context-window", "tokens", "compaction", "subagents"],
-  "description": "See what fills your context window, what changed last turn, and where tokens are wasted",
+  "description": "See what fills your context window, what the last prompt added, and where tokens are wasted",
   "types": "./types/index.d.ts",
   "userConfig": {
     "autoOpen": {
