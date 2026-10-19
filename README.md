@@ -29,6 +29,8 @@ Agents compares how much each subagent read with how much it sent back.
 
 Per-block token counts are estimates.
 
+Only the ablation calls a model, and only after you press Run or type `/ctx ablate run` yourself. Nothing else in Context Lens spends tokens.
+
 ## Compaction notes
 
 When you run `/compact` or auto-compact kicks in, Context Lens tells the summarizer which files were edited and which reads are stale. This and Drop don't run where an organization manages Claude Code.

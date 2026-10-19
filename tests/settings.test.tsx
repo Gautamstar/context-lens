@@ -133,18 +133,18 @@ test('/ctx ablate shows the cost and runs nothing until /ctx ablate run', { opti
   on('model.classify', () => ({ value: 'same' } as never))
   on('ui.toast', () => ({ value: undefined }))
 
-  const planned = await $.command.run({ command: 'ctx', args: 'ablate 2' } as never)
+  const planned = await $.command.run({ command: 'ctx', args: 'ablate 2', origin: { kind: 'composer' } } as never)
   expect((planned as { text: string }).text).toMatch(/^Testing 2 blocks takes 4 replays with sonnet .*\$0\.\d\d at list price/)
   await clock.settle()
   expect(calls).toBe(0)
 
-  const cancelled = await $.command.run({ command: 'ctx', args: 'ablate cancel' } as never)
+  const cancelled = await $.command.run({ command: 'ctx', args: 'ablate cancel', origin: { kind: 'composer' } } as never)
   expect((cancelled as { text: string }).text).toBe('Ablation cancelled.')
-  const nothing = await $.command.run({ command: 'ctx', args: 'ablate run' } as never)
+  const nothing = await $.command.run({ command: 'ctx', args: 'ablate run', origin: { kind: 'composer' } } as never)
   expect((nothing as { text: string }).text).toMatch(/^Nothing to run/)
 
-  await $.command.run({ command: 'ctx', args: 'ablate 2' } as never)
-  const ran = await $.command.run({ command: 'ctx', args: 'ablate run' } as never)
+  await $.command.run({ command: 'ctx', args: 'ablate 2', origin: { kind: 'composer' } } as never)
+  const ran = await $.command.run({ command: 'ctx', args: 'ablate run', origin: { kind: 'composer' } } as never)
   expect((ran as { text: string }).text).toBe('Testing 2 blocks with sonnet. Results fill in the Context Lens pane.')
   await clock.settle()
   expect(calls).toBe(4)
