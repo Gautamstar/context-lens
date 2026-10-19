@@ -287,17 +287,6 @@ export const diff = (previousIds: readonly string[] | undefined, previousTokens:
   return { added, addedTokens, droppedTokens: Math.max(0, previousTokens - kept) }
 }
 
-// The breakdown reports auto-compact at the window less a 13k reserve and
-// ignores CLAUDE_AUTOCOMPACT_PCT_OVERRIDE, which the compaction check itself
-// applies: the lower of that percentage of the window and the usual point.
-const AUTOCOMPACT_RESERVE = 13_000
-
-export const autoCompactPoint = (reported: number, overridePercent: string | undefined): number => {
-  const percent = Number(overridePercent)
-  if (!overridePercent || !Number.isFinite(percent) || percent <= 0 || percent > 100) return reported
-  return Math.min(Math.floor((reported + AUTOCOMPACT_RESERVE) * (percent / 100)), reported)
-}
-
 export const formatTokens = (tokens: number): string =>
   tokens >= 1_000_000 ? `${(tokens / 1_000_000).toFixed(1)}M`
   : tokens >= 10_000 ? `${Math.round(tokens / 1000)}k`

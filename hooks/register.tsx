@@ -4,7 +4,7 @@ import type { EngineInterface, ModelUsage, PluginOptions, Register } from 'claud
 import type { Ablation, AblationPlan, AblationResult, AgentRow, DropRequest, History, PaneTab, Snapshot } from '../types'
 import { cacheMarks, estimateAblation, judgeText, JUDGE_LABELS, pickCandidates, promptTokens, replayPrompt, toReplay, verdictOf } from './ablation'
 import type { Replay, Segment, TextBlock } from './ablation'
-import { autoCompactPoint, calibrate, diff, estimateTokens, estimateTranscript, findWaste, formatTokens, LARGE_OUTPUT_TOKENS, mergeCalls, parse, readsInContext, stubResults } from './analyze'
+import { calibrate, diff, estimateTokens, estimateTranscript, findWaste, formatTokens, LARGE_OUTPUT_TOKENS, mergeCalls, parse, readsInContext, stubResults } from './analyze'
 import type { Message, Parsed } from './analyze'
 import { compactionHints, editedFiles, withHints } from './hints'
 import { drawPane } from './pane'
@@ -70,12 +70,11 @@ const byTokens = (a: { tokens: number }, b: { tokens: number }) => b.tokens - a.
 // Reads the window and the conversation, and stores what the pane draws.
 // `summary` estimates locally; `full` asks the token-count API, as /context does.
 const refresh = async ($: EngineInterface, detail: 'summary' | 'full' = 'summary'): Promise<Snapshot | null> => {
-  const [usage, messages, rows, stats, compactPercent] = await Promise.all([
+  const [usage, messages, rows, stats] = await Promise.all([
     $.session.usage({ breakdown: detail }),
     $.session.messages({ as: 'api' }),
     $.session.messages(),
     read($, agentStats),
-    $.env.get('CLAUDE_AUTOCOMPACT_PCT_OVERRIDE').catch(() => undefined),
   ])
   // The same call can appear in more than one row; one entry per call.
   const agentUses = [...new Map(rows.flatMap(row => row.toolUses ?? [])
@@ -126,9 +125,7 @@ const refresh = async ($: EngineInterface, detail: 'summary' | 'full' = 'summary
       wasteTokens: waste.reduce((sum, item) => sum + item.tokens, 0),
       calibration: factor,
       agents: agents.slice(-8),
-      autoCompactAt: breakdown?.isAutoCompactEnabled
-        ? breakdown.autoCompactThreshold === undefined ? undefined : autoCompactPoint(breakdown.autoCompactThreshold, compactPercent)
-        : previous?.autoCompactAt,
+      autoCompactAt: breakdown?.isAutoCompactEnabled ? breakdown.autoCompactThreshold : previous?.autoCompactAt,
       editedFiles: editedFiles(rows.flatMap(row => row.toolUses ?? [])),
       blockIds: parsed.blocks.map(block => block.id),
     }
