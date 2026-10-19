@@ -1,0 +1,39 @@
+{
+  "name": "context-lens",
+  "version": "0.1.0",
+  "author": { "name": "Gautam Singh", "url": "https://github.com/Gautamstar" },
+  "homepage": "https://github.com/Gautamstar/context-lens",
+  "repository": "https://github.com/Gautamstar/context-lens",
+  "license": "MIT",
+  "keywords": ["context", "context-window", "tokens", "compaction", "subagents"],
+  "description": "See what fills your context window, what changed last turn, and where tokens are wasted",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "autoOpen": {
+      "type": "string",
+      "title": "Open the pane at session start",
+      "description": "in-app opens it in the desktop app and VS Code only; in a terminal, /ctx opens it",
+      "options": ["in-app", "always", "never"],
+      "default": "in-app"
+    },
+    "ablationModel": {
+      "type": "string",
+      "title": "Model for /ctx ablate replays",
+      "description": "haiku is cheap and good enough for most tests; sonnet is closer to the session's own model",
+      "options": ["haiku", "sonnet"],
+      "default": "haiku"
+    },
+    "largeOutputTokens": {
+      "type": "number",
+      "title": "Flag tool outputs above this many tokens",
+      "description": "Tool results at least this big are listed as likely waste",
+      "default": 5000
+    },
+    "compactionHints": {
+      "type": "boolean",
+      "title": "Add notes to /compact",
+      "description": "Tell the summarizer which files were edited, which blocks mattered, and which reads are stale",
+      "default": true
+    }
+  }
+}

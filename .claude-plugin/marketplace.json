@@ -1,0 +1,6 @@
+{
+  "name": "context-lens",
+  "owner": { "name": "Gautam Singh" },
+  "description": "Context Lens, a Claude Code mod for seeing and testing what fills the context window",
+  "plugins": [{ "name": "context-lens", "source": "./" }]
+}
