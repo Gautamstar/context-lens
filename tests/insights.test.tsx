@@ -1,6 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 
-import { calibrate, estimateTranscript, findWaste, parse, stubResults } from '../hooks/analyze'
+import { autoCompactPoint, calibrate, estimateTranscript, findWaste, parse, stubResults } from '../hooks/analyze'
 import type { Message } from '../hooks/analyze'
 
 const read = (id: string, path: string, body = 'x'.repeat(4000)): Message[] => [
@@ -126,4 +126,14 @@ test('Drop stubs out exactly the flagged results and keeps every other message w
     { tool_use_id: 'r2', text: 'keep me', isError: false },
   ])
   expect(stubResults(rows, new Set(['nope']), 'STUB')).toEqual(rows)
+})
+
+test('the auto-compact point honors CLAUDE_AUTOCOMPACT_PCT_OVERRIDE as the engine does', () => {
+  // A 1M window reports 987k; at 40% the engine compacts at 400k.
+  expect(autoCompactPoint(987_000, '40')).toBe(400_000)
+  // The override only lowers the point.
+  expect(autoCompactPoint(187_000, '99')).toBe(187_000)
+  expect(autoCompactPoint(987_000, undefined)).toBe(987_000)
+  expect(autoCompactPoint(987_000, 'abc')).toBe(987_000)
+  expect(autoCompactPoint(987_000, '0')).toBe(987_000)
 })
