@@ -115,7 +115,7 @@ test('the pane draws an empty state, then what a measurement found, on every sur
 
   for (const surface of ['terminal', 'desktop', 'vscode', 'mobile'] as const) {
     const empty = await $.ui.mount({ plugin: 'context-lens', surface, component: 'Pane', requestId: 'context-lens', props: PANE_PROPS })
-    expect(await empty.find({ type: 'Text', text: /Waiting for the first turn/ })).toBeDefined()
+    expect(await empty.find({ type: 'Text', text: /Waiting for the first prompt/ })).toBeDefined()
     await empty.unmount()
   }
 

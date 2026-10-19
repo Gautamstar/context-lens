@@ -183,7 +183,7 @@ export const drawPane = (
     return (
       <Box flexDirection="column">
         {tabBar}
-        <Box marginTop={1}>{quiet('Waiting for the first turn to measure the window.')}</Box>
+        <Box marginTop={1}>{quiet('Waiting for the first prompt to measure the window.')}</Box>
       </Box>
     )
   }
@@ -243,20 +243,21 @@ export const drawPane = (
     if (lastCost.usd !== undefined) parts.push(formatUsd(lastCost.usd))
     return parts.join(' · ')
   })()
+  const prompts = `${past.points.length} prompt${past.points.length === 1 ? '' : 's'}`
   const percents = past.points.slice(-Math.max(10, width)).map(point => point.percent)
   const thresholdPercent = compactAt === undefined ? undefined : percentOf(compactAt, window)
   const timeline = percents.length < 2 && !lastCost ? undefined : section(
     'timeline',
     'Over time',
     <Text dimColor tabular>
-      {past.compactions.length === 0 ? `${past.points.length} turns`
-        : `${past.points.length} turns · ${past.compactions.length} compacted`}
+      {past.compactions.length === 0 ? prompts
+        : `${prompts} · ${past.compactions.length} compacted`}
     </Text>,
     <Box flexDirection="column">
       {percents.length >= 2 && (isTerminal || !('Svg' in els)
         ? <Text color={fillColor ?? BLUE}>{sparkline(percents)}</Text>
-        : <els.Svg source={timelineSvg(percents, fillColor ?? BLUE, thresholdPercent)} alt={`Window fill over the last ${percents.length} turns, now ${percent}%`} />)}
-      {costLine && row('cost', <Text><Text dimColor>Last turn </Text>{costLine}</Text>,
+        : <els.Svg source={timelineSvg(percents, fillColor ?? BLUE, thresholdPercent)} alt={`Window fill over the last ${percents.length} prompts, now ${percent}%`} />)}
+      {costLine && row('cost', <Text><Text dimColor>Last prompt </Text>{costLine}</Text>,
         sessionUsd > 0 ? <Text dimColor tabular>{`${formatUsd(sessionUsd)} total`}</Text> : <Text>{''}</Text>)}
     </Box>,
   )
@@ -268,7 +269,7 @@ export const drawPane = (
       {current.droppedTokens > 0 ? <Text color={MUTED}>{`  −${formatTokens(current.droppedTokens)}`}</Text> : ''}
     </Text>
   )
-  const lastTurn = section('turn', 'New this turn', turnAside,
+  const lastTurn = section('turn', 'Added by the last prompt', turnAside,
     added.length === 0
       ? quiet('Nothing new since the last refresh.')
       : added.slice(0, 4).map(block => blockRow('added', block)))

@@ -19,9 +19,9 @@ Needs Claude Code 2.1.299 or later. The plugin API is still early access, so a C
 
 ## Tabs
 
-Overview shows how full the window is, token use by category, fill over time, and what the last turn cost.
+Overview shows how full the window is, token use by category, fill over time, and what the last prompt cost.
 
-Blocks lists likely waste: files read more than once, reads of files that changed afterwards, tool outputs over 5k tokens, and MCP tools that were never called. Drop removes one of these from the conversation without summarizing anything else. It resets the prompt cache, so the next turn costs more.
+Blocks lists likely waste: files read more than once, reads of files that changed afterwards, tool outputs over 5k tokens, and MCP tools that were never called. Drop removes one of these from the conversation without summarizing anything else. It resets the prompt cache, so the next prompt costs more.
 
 Ablation replays your last question with each big block removed and shows which ones changed the answer. It shows an estimated cost first and waits for you to press Run. The replays run on Haiku over a flattened transcript, so treat the results as hints.
 
